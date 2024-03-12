@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create an EC2 Instance with openvpn AMI
+
+Mappings:
+  RegionMap:
+    ap-southeast-1:
+      AMI: ami-0c2639422d6fc7d69
+    ap-southeast-2:
+      AMI: ami-056303ef214800fec
+
+Parameters:
+  InstanceName:
+    Type: String
+    Description: The name of the ec2 instance
+    Default: openvpn
+  KeyPairName:
+    Type: String
+    Descrption: The name of the ec2 key pair
+    Default: openvpn
+  InstanceType:
+    Type: String
+    Description:
+
+Resources:
+  MyElasticIP:
+    Type: AWS::EC2::EIP
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap,!Ref AWS::Region, AMI]
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairName
+      
+  EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+      AllocationId: !GetAtt MyElasticIP.AllocationId
+
+
+      
+      
+

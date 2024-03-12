@@ -1,0 +1,3 @@
+*.pem
+*.ovpn
+.DS_Store
