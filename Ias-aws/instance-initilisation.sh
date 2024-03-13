@@ -1,59 +1,122 @@
 #!/bin/bash
 
+set -e
+
+# Check if expect is installed and install it if not
+# if ! command -v expect &> /dev/null; then
+#     echo "expect could not be found, attempting to install it..."
+
+#     # Detect the package manager and install expect
+#     if command -v apt-get &> /dev/null; then
+#         sudo apt-get update && sudo apt-get install -y expect
+#     elif command -v yum &> /dev/null; then
+#         sudo yum install -y expect
+#     elif command -v brew &> /dev/null; then
+#         brew install expect
+#     else
+#         echo "No compatible package manager found. Please install expect manually."
+#         exit 1
+#     fi
+
+#     echo "expect has been installed."
+# fi
+
 # Define variables for configuration settings
-ADMIN_INTERFACE="0.0.0.0"
-CA_TYPE="secp384r1"
-WEB_CERT_TYPE="secp384r1"
+echo "Defining configuration settings..."
+
+USER="openvpnas"
+HOST="ec2-13-250-146-17.ap-southeast-1.compute.amazonaws.com"
 ADMIN_PORT="943"
 VPN_PORT="443"
-ROUTE_CLIENT_TRAFFIC="yes"
-ROUTE_DNS_TRAFFIC="no"
-ACCESS_PRIVATE_SUBNETS="yes"
 OPENVPN_USERNAME="openvpn"
-OPENVPN_PASSWORD="YourStrongPassword" # Replace with your desired password
+OPENVPN_PASSWORD="Dingyi1224!" # Replace with your desired password
 
-# Update the system
-sudo apt update && sudo apt upgrade -y
+echo "Setting permissions for openvpn.pem..."
 
-# Install OpenVPN Access Server
-# Assuming wget and gdebi are already installed
-wget [URL to OpenVPN Access Server package]
-sudo gdebi [OpenVPN package name]
+chmod 400 "openvpn.pem"
 
-# Use 'expect' to handle interactive prompts
-expect <<END
-  spawn /usr/local/openvpn_as/bin/ovpn-init
-  expect "Agree? \\\[no\\\]:"
-  send "yes\r"
-  expect "Primary Access Server node? \\\[yes\\\]:"
-  send "\r"
-  expect "Specify the network interface"
-  send "\r"
-  expect "What public/private type/algorithms for OpenVPN CA?"
-  send "\r"
-  expect "What public/private type/algorithms for the self-signed web certificate?"
-  send "\r"
-  expect "Specify the port number for the Admin Web UI."
-  send "\r"
-  expect "Specify the TCP port number for the OpenVPN Daemon"
-  send "\r"
-  expect "Should client traffic be routed by default through the VPN?"
-  send "$ROUTE_CLIENT_TRAFFIC\r"
-  expect "Should client DNS traffic be routed by default through the VPN?"
-  send "$ROUTE_DNS_TRAFFIC\r"
-  expect "Private subnets detected:"
-  send "$ACCESS_PRIVATE_SUBNETS\r"
-  expect "login to the Admin UI as 'openvpn'?"
-  send "\r"
-  expect "Type a password for the 'openvpn' account:"
-  send "$OPENVPN_PASSWORD\r"
-  expect "Confirm the password for the 'openvpn' account:"
-  send "$OPENVPN_PASSWORD\r"
-  expect "Please specify your Activation key (or leave blank to specify later):"
-  send "\r"
-  expect eof
-END
+# Begin the configuration of OpenVPN Access Server
+echo "Configuring OpenVPN Access Server..."
 
-# Additional configurations and setups can go here
+# Use expect to handle the entire SSH and configuration process
+/usr/bin/expect <<EOF
+set timeout 30
+
+spawn ssh -i "openvpn.pem" $USER@$HOST
+
+# Initial SSH connection and authenticity check
+expect {
+    -re {Are you sure you want to continue connecting.*} {
+        send "yes\r"
+        exp_continue
+    }
+    -re {Please enter 'yes' to indicate your agreement \\[no\\]:} {
+        send "yes\r"
+        exp_continue
+    }
+    -re {Will this be the primary Access Server node.*} {
+        send "\r"  ;# Press ENTER for default [yes]
+        exp_continue
+    }
+    -re {Please enter the option number from the list above.*} {
+        send "\r"
+        exp_continue
+    }
+    -re {What public/private type/algorithms do you want to use for the OpenVPN CA.*} {
+        send "\r"
+        exp_continue
+    }
+    -re {What public/private type/algorithms do you want to use for the self-signed web certificate.*} {
+        send "\r"
+        exp_continue
+    }
+    -re {Please specify the port number for the Admin Web UI} {
+        send "$ADMIN_PORT\r"
+        exp_continue
+    }
+    -re {Please specify the TCP port number for the OpenVPN Daemon} {
+        send "$VPN_PORT\r"
+        exp_continue
+    }
+    -re {Should client traffic be routed by default through the VPN.*} {
+        send "yes\r"
+        exp_continue
+    }
+    -re {Should client DNS traffic be routed by default through the VPN.*} {
+        send "\r"
+        exp_continue
+    }
+    -re {Should private subnets be accessible to clients by default.*} {
+        send "\r"
+        exp_continue
+    }
+    -re {Do you wish to login to the Admin UI as "openvpn".*} {
+        send "\r"
+        exp_continue
+    }
+    -re {Type a password for the 'openvpn' account.*} {
+        send "$OPENVPN_PASSWORD\r"
+        exp_continue
+    }
+    -re {Confirm the password for the 'openvpn' account.*} {
+        send "$OPENVPN_PASSWORD\r"
+        exp_continue
+    }
+    -re {Please specify your Activation key.*} {
+        send "\r"
+    }
+    timeout {
+        send_user "Connection timed out\n"
+        exit 1
+    }
+    eof {
+        send_user "SSH connection failed or was interrupted\n"
+        exit 1
+    }
+}
+
+expect eof
+EOF
 
 echo "OpenVPN Access Server setup is complete."
+

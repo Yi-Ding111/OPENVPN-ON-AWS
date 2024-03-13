@@ -1,13 +1,11 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Create an EC2 Instance with openvpn AMI
-
 Mappings:
   RegionMap:
     ap-southeast-1:
       AMI: ami-0c2639422d6fc7d69
     ap-southeast-2:
       AMI: ami-056303ef214800fec
-
 Parameters:
   InstanceName:
     Type: String
@@ -15,30 +13,56 @@ Parameters:
     Default: openvpn
   KeyPairName:
     Type: String
-    Descrption: The name of the ec2 key pair
+    Description: The name of the ec2 key pair
     Default: openvpn
   InstanceType:
     Type: String
-    Description:
-
+    Description: The instance type for ec2
+    Default: t2.micro
+  VpcId:
+    Type: String
+    Description: The id of VPC for sg
+    Default: vpc-076e43b81b53b8a8e
 Resources:
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for EC2 instance
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 943
+          ToPort: 943
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
   MyElasticIP:
     Type: AWS::EC2::EIP
-
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [RegionMap,!Ref AWS::Region, AMI]
-      InstanceType: t2.micro
+      ImageId: !FindInMap [RegionMap, !Ref AWS::Region, AMI]
+      InstanceType: !Ref InstanceType
       KeyName: !Ref KeyPairName
-      
+      SecurityGroupIds:
+        - !GetAtt MySecurityGroup.GroupId
   EIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       InstanceId: !Ref MyEC2Instance
       AllocationId: !GetAtt MyElasticIP.AllocationId
-
-
-      
-      
-
