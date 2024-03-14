@@ -37,34 +37,35 @@ jobs:
         run: |
           echo "${{ secrets.AWS_EC2_PEM }}" | base64 -d > openvpn.pem
           chmod 600 openvpn.pem
+          pwd openvpn.pem
         env:
           AWS_EC2_PEM: ${{ secrets.AWS_EC2_PEM }}
 
-  deploy-ias-aws:
-    runs-on: ubuntu-latest
-    needs: setup-keypairs
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Ias-aws') || github.event.inputs.runScope == 'Ias-aws'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Config aws credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::724193151683:role/openvpn_github
-          aws-region: ap-southeast-1
-      - name: Deploy cfn stack
-        run: |
-          aws cloudformation deploy \
-          --template-file Ias-aws/ec2-openvpn-ami.yml \
-          --stack-name openvpn-yd \
-          --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
-      - name: Retrieve Elastic IP
-        run: |
-          EIP_ADDRESS=$(aws cloudformation describe-stacks --stack-name openvpn-yd --query "Stacks[0].Outputs[?OutputKey=='ElasticIPAddress'].OutputValue" --output text)
-          FORMATTED_EIP_ADDRESS=$(echo $EIP_ADDRESS | tr '.' '-')
-          echo "FORMATTED_EIP_ADDRESS=$FORMATTED_EIP_ADDRESS" >> $GITHUB_ENV
-          echo "Elastic IP Address is $FORMATTED_EIP_ADDRESS"
-      - name: Openvpn infrastructure initialization
-        run: |
-          sudo apt-get update && sudo apt-get install -y expect
-          ./Ias-aws/instance-initilisation.sh
+  # deploy-ias-aws:
+  #   runs-on: ubuntu-latest
+  #   needs: setup-keypairs
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Ias-aws') || github.event.inputs.runScope == 'Ias-aws'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Config aws credentials
+  #       uses: aws-actions/configure-aws-credentials@v3
+  #       with:
+  #         role-to-assume: arn:aws:iam::724193151683:role/openvpn_github
+  #         aws-region: ap-southeast-1
+  #     - name: Deploy cfn stack
+  #       run: |
+  #         aws cloudformation deploy \
+  #         --template-file Ias-aws/ec2-openvpn-ami.yml \
+  #         --stack-name openvpn-yd \
+  #         --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+  #     - name: Retrieve Elastic IP
+  #       run: |
+  #         EIP_ADDRESS=$(aws cloudformation describe-stacks --stack-name openvpn-yd --query "Stacks[0].Outputs[?OutputKey=='ElasticIPAddress'].OutputValue" --output text)
+  #         FORMATTED_EIP_ADDRESS=$(echo $EIP_ADDRESS | tr '.' '-')
+  #         echo "FORMATTED_EIP_ADDRESS=$FORMATTED_EIP_ADDRESS" >> $GITHUB_ENV
+  #         echo "Elastic IP Address is $FORMATTED_EIP_ADDRESS"
+  #     - name: Openvpn infrastructure initialization
+  #       run: |
+  #         sudo apt-get update && sudo apt-get install -y expect
+  #         ./Ias-aws/instance-initilisation.sh
 
