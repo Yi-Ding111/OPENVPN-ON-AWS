@@ -25,11 +25,11 @@ set -e
 echo "Defining configuration settings..."
 
 USER="openvpnas"
-EIP_ADDRESS=$FORMATTED_EIP_ADDRESS
+EIP_ADDRESS=$FORMATTED_EIP_ADDRESS # replace with your IP address
 ADMIN_PORT="943"
 VPN_PORT="443"
 OPENVPN_USERNAME="openvpn"
-OPENVPN_PASSWORD="Dingyi1224!" # Replace with your desired password
+OPENVPN_PASSWORD=$OPENVPN_PASSWORD # Replace with your desired password
 
 echo "Setting permissions for openvpn.pem..."
 
