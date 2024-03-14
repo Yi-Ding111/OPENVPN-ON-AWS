@@ -52,5 +52,8 @@ jobs:
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
       
       - name: openvpn infrasture initilisation
-        run: ./Ias-aws/instance-initilisation.sh
+
+        run: |
+          sudo apt-get update && sudo apt-get install -y expect
+          ./Ias-aws/instance-initilisation.sh
 
