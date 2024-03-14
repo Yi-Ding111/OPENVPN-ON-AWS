@@ -51,17 +51,12 @@ jobs:
           --stack-name openvpn-yd \
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
-      - name: Retrieve Elastic IP Allocation ID and Address
-        id: get_eip
+      - name: Retrieve CloudFormation Output for Elastic IP
+        id: cfn_output
         run: |
-          ALLOCATION_ID=$(aws cloudformation describe-stack-resources --stack-name openvpn-yd --query "StackResources[?LogicalResourceId=='MyElasticIP'].PhysicalResourceId" --output text)
-          if [[ $ALLOCATION_ID == eipalloc-* ]]; then
-            HOST=$(aws ec2 describe-addresses --allocation-ids $ALLOCATION_ID --query "Addresses[*].PublicIp" --output text)
-            echo "::set-output name=HOST::$HOST"
-          else
-            echo "Invalid Allocation ID"
-            exit 1
-          fi
+          EIP_ADDRESS=$(aws cloudformation describe-stacks --stack-name openvpn-yd --query "Stacks[0].Outputs[?OutputKey=='ElasticIPAddress'].OutputValue" --output text)
+          echo "::set-output name=EIP_ADDRESS::$EIP_ADDRESS"
+
       
       # - name: openvpn infrasture initilisation
       #   run: |

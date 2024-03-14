@@ -6,6 +6,7 @@ Mappings:
       AMI: ami-0c2639422d6fc7d69
     ap-southeast-2:
       AMI: ami-056303ef214800fec
+
 Parameters:
   InstanceName:
     Type: String
@@ -23,6 +24,7 @@ Parameters:
     Type: String
     Description: The id of VPC for sg
     Default: vpc-076e43b81b53b8a8e
+    
 Resources:
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -66,3 +68,8 @@ Resources:
     Properties:
       InstanceId: !Ref MyEC2Instance
       AllocationId: !GetAtt MyElasticIP.AllocationId
+
+Outputs:
+  ElasticIPAddress:
+    Description: The Elastic IP address of the instance
+    Value: !GetAtt MyElasticIP.PublicIp
