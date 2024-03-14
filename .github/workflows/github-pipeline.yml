@@ -55,7 +55,13 @@ jobs:
         id: cfn_output
         run: |
           EIP_ADDRESS=$(aws cloudformation describe-stacks --stack-name openvpn-yd --query "Stacks[0].Outputs[?OutputKey=='ElasticIPAddress'].OutputValue" --output text)
-          echo "::set-output name=EIP_ADDRESS::$EIP_ADDRESS"
+          echo "EIP_ADDRESS=$EIP_ADDRESS" >> $GITHUB_ENV
+
+      - name: Use Elastic IP Address
+        run: |
+          echo "Elastic IP Address is $EIP_ADDRESS"
+          # Use EIP_ADDRESS in your scripts or commands
+
 
       
       # - name: openvpn infrasture initilisation
