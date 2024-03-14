@@ -72,7 +72,7 @@ jobs:
           --template-file Ias-aws/ec2-openvpn-ami.yml \
           --stack-name openvpn-yd \
           --parameter-overrides \
-            VpcId=${{ secrets.VPC_ID }}\
+            VpcId=${{ secrets.VPC_ID }} \
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
       - name: Retrieve Elastic IP
