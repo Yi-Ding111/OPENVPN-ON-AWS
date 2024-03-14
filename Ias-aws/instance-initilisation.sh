@@ -33,7 +33,7 @@ OPENVPN_PASSWORD="Dingyi1224!" # Replace with your desired password
 
 echo "Setting permissions for openvpn.pem..."
 
-chmod 400 "/home/runner/work/OPENVPN-ON-AWS/OPENVPN-ON-AWS/openvpn.pem"
+chmod 400 "openvpn.pem"
 
 # Begin the configuration of OpenVPN Access Server
 echo "Configuring OpenVPN Access Server..."
@@ -42,7 +42,7 @@ echo "Configuring OpenVPN Access Server..."
 /usr/bin/expect <<EOF
 set timeout 30
 
-spawn ssh -i "/home/runner/work/OPENVPN-ON-AWS/OPENVPN-ON-AWS/openvpn.pem" $USER@ec2-$FORMATTED_EIP_ADDRESS.ap-southeast-1.compute.amazonaws.com
+spawn ssh -i "openvpn.pem" $USER@ec2-$FORMATTED_EIP_ADDRESS.ap-southeast-1.compute.amazonaws.com
 
 # Initial SSH connection and authenticity check
 expect {
