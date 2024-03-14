@@ -29,7 +29,7 @@ permissions:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
-  OPENVPN_PASSWORD: ${{ secrets.OPENVPN.PASSWORD}}
+  OPENVPN_PASSWORD: ${{ secrets.OPENVPN_PASSWORD}}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -63,8 +63,8 @@ jobs:
       - name: Config aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::724193151683:role/openvpn_github
-          aws-region: ap-southeast-1
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          aws-region: $AWS_REGION
 
       - name: Deploy cfn stack
         run: |
