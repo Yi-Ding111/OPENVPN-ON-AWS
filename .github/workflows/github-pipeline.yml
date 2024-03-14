@@ -48,8 +48,8 @@ jobs:
   deploy-ias-aws:
     runs-on: ubuntu-latest
     needs: setup-keypairs
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Ias-aws') || github.event.inputs.runScope == 'Ias-aws'
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event.inputs.runScope == 'Ias-aws'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, 'Ias-aws') || github.event.inputs.runScope == 'Ias-aws'
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event.inputs.runScope == 'Ias-aws'
     steps:
       - uses: actions/checkout@v4
 
