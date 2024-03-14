@@ -25,7 +25,7 @@ set -e
 echo "Defining configuration settings..."
 
 USER="openvpnas"
-HOST="ec2-13-250-146-17.ap-southeast-1.compute.amazonaws.com"
+EIP_ADDRESS=$FORMATTED_EIP_ADDRESS
 ADMIN_PORT="943"
 VPN_PORT="443"
 OPENVPN_USERNAME="openvpn"
@@ -42,7 +42,7 @@ echo "Configuring OpenVPN Access Server..."
 /usr/bin/expect <<EOF
 set timeout 30
 
-spawn ssh -i "openvpn.pem" $USER@$HOST
+spawn ssh -i "openvpn.pem" $USER@ec2-$FORMATTED_EIP_ADDRESS.ap-southeast-1.compute.amazonaws.com
 
 # Initial SSH connection and authenticity check
 expect {
