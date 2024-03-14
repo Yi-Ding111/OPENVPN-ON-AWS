@@ -50,10 +50,16 @@ jobs:
           --template-file Ias-aws/ec2-openvpn-ami.yml \
           --stack-name openvpn-yd \
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
-      
-      - name: openvpn infrasture initilisation
 
+      - name: Retrieve Elastic IP Address
+        id: get_eip
         run: |
-          sudo apt-get update && sudo apt-get install -y expect
-          ./Ias-aws/instance-initilisation.sh
+          ALLOCATION_ID=$(aws cloudformation describe-stack-resources --stack-name openvpn-yd --query "StackResources[?LogicalResourceId=='MyElasticIP'].PhysicalResourceId" --output text)
+          HOST=$(aws ec2 describe-addresses --allocation-ids $ALLOCATION_ID --query "Addresses[*].PublicIp" --output text)
+          echo "::set-output name=HOST::$HOST"
+      
+      # - name: openvpn infrasture initilisation
+      #   run: |
+      #     sudo apt-get update && sudo apt-get install -y expect
+      #     ./Ias-aws/instance-initilisation.sh
 
