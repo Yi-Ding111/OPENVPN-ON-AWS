@@ -52,5 +52,5 @@ jobs:
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
       
       - name: openvpn infrasture initilisation
-        run: Ias-aws/ec2-openvpn-ami.yml
+        run: ./Ias-aws/ec2-openvpn-ami.yml
 
