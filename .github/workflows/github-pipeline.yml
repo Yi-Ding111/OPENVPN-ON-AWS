@@ -38,7 +38,7 @@ jobs:
           echo "${{ secrets.AWS_EC2_PEM }}" | base64 -d > openvpn.pem
           chmod 600 openvpn.pem
           pwd openvpn.pem
-          echo "Value of a2: {{$AWS_REGION}}"
+          echo "Value of a2: {{env.$AWS_REGION}}"
         # env:
           # AWS_EC2_PEM: ${{ secrets.AWS_EC2_PEM }}
       - uses: actions/upload-artifact@v2
