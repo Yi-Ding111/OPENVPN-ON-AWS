@@ -50,4 +50,7 @@ jobs:
           --template-file Ias-aws/ec2-openvpn-ami.yml \
           --stack-name openvpn-yd \
           --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+      
+      - name: openvpn infrasture initilisation
+        run: Ias-aws/ec2-openvpn-ami.yml
 
