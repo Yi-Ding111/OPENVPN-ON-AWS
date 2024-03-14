@@ -27,6 +27,9 @@ permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
 
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   setup-keypairs:
@@ -38,7 +41,7 @@ jobs:
           echo "${{ secrets.AWS_EC2_PEM }}" | base64 -d > openvpn.pem
           chmod 600 openvpn.pem
           pwd openvpn.pem
-          echo "Value of a2: ${{ github.event.inputs.AWS_REGION }}"
+          echo "Value of a2: $AWS_REGION"
         # env:
           # AWS_EC2_PEM: ${{ secrets.AWS_EC2_PEM }}
       - uses: actions/upload-artifact@v2
